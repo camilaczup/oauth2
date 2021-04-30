@@ -62,7 +62,7 @@ func TestTokenSourceGrantTypeOverride(t *testing.T) {
 			"grant_type": {wantGrantType},
 		},
 	}
-	token, err := config.TokenSource(context.Background()).Token()
+	token, err := config.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Errorf("config.TokenSource(_).Token() == %v, %v, want !<nil>, <nil>", token, err)
 	}

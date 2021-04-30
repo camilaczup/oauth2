@@ -11,7 +11,7 @@ import (
 
 type tokenSource struct{ token *Token }
 
-func (t *tokenSource) Token() (*Token, error) {
+func (t *tokenSource) Token(headers http.Header) (*Token, error) {
 	return t.token, nil
 }
 

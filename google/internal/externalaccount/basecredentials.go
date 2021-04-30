@@ -7,10 +7,11 @@ package externalaccount
 import (
 	"context"
 	"fmt"
-	"golang.org/x/oauth2"
 	"net/http"
 	"strconv"
 	"time"
+
+	"golang.org/x/oauth2"
 )
 
 // now aliases time.Now for testing
@@ -114,7 +115,7 @@ type tokenSource struct {
 }
 
 // Token allows tokenSource to conform to the oauth2.TokenSource interface.
-func (ts tokenSource) Token() (*oauth2.Token, error) {
+func (ts tokenSource) Token(headers http.Header) (*oauth2.Token, error) {
 	conf := ts.conf
 
 	credSource, err := conf.parse(ts.ctx)

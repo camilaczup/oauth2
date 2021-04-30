@@ -42,7 +42,7 @@ func TestJWTFetch_JSONResponse(t *testing.T) {
 		},
 	}
 
-	tok, err := conf.TokenSource(context.Background()).Token()
+	tok, err := conf.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func TestJWTFetch_BadResponse(t *testing.T) {
 		},
 	}
 
-	tok, err := conf.TokenSource(context.Background()).Token()
+	tok, err := conf.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,7 +119,7 @@ func TestJWTFetch_BadResponseType(t *testing.T) {
 		},
 	}
 
-	tok, err := conf.TokenSource(context.Background()).Token()
+	tok, err := conf.TokenSource(context.Background()).Token(nil)
 	if err == nil {
 		t.Error("got a token; expected error")
 		if got, want := tok.AccessToken, ""; got != want {
@@ -156,7 +156,7 @@ func TestJWTFetch_Assertion(t *testing.T) {
 		},
 	}
 
-	_, err := conf.TokenSource(context.Background()).Token()
+	_, err := conf.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Fatalf("Failed to fetch token: %v", err)
 	}
