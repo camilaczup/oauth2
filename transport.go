@@ -42,7 +42,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if t.Source == nil {
 		return nil, errors.New("oauth2: Transport's Source is nil")
 	}
-	token, err := t.Source.Token()
+	token, err := t.Source.Token(req.Header)
 	if err != nil {
 		return nil, err
 	}

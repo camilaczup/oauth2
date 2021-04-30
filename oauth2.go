@@ -64,7 +64,7 @@ type TokenSource interface {
 	// Token returns a token or an error.
 	// Token must be safe for concurrent use by multiple goroutines.
 	// The returned Token must not be modified.
-	Token() (*Token, error)
+	Token(headers http.Header) (*Token, error)
 }
 
 // Endpoint represents an OAuth 2.0 provider's authorization and token
@@ -195,7 +195,7 @@ func (c *Config) PasswordCredentialsToken(ctx context.Context, username, passwor
 	if len(c.Scopes) > 0 {
 		v.Set("scope", strings.Join(c.Scopes, " "))
 	}
-	return retrieveToken(ctx, c, v)
+	return retrieveToken(ctx, c, v, nil)
 }
 
 // Exchange converts an authorization code into a token.
@@ -221,7 +221,7 @@ func (c *Config) Exchange(ctx context.Context, code string, opts ...AuthCodeOpti
 	for _, opt := range opts {
 		opt.setValue(v)
 	}
-	return retrieveToken(ctx, c, v)
+	return retrieveToken(ctx, c, v, nil)
 }
 
 // Client returns an HTTP client using the provided token.
@@ -262,7 +262,7 @@ type tokenRefresher struct {
 // updates the tokenRefresher's refreshToken field.
 // Within this package, it is used by reuseTokenSource which
 // synchronizes calls to this method with its own mutex.
-func (tf *tokenRefresher) Token() (*Token, error) {
+func (tf *tokenRefresher) Token(headers http.Header) (*Token, error) {
 	if tf.refreshToken == "" {
 		return nil, errors.New("oauth2: token expired and refresh token is not set")
 	}
@@ -270,7 +270,7 @@ func (tf *tokenRefresher) Token() (*Token, error) {
 	tk, err := retrieveToken(tf.ctx, tf.conf, url.Values{
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {tf.refreshToken},
-	})
+	}, headers)
 
 	if err != nil {
 		return nil, err
@@ -295,13 +295,13 @@ type reuseTokenSource struct {
 // Token returns the current token if it's still valid, else will
 // refresh the current token (using r.Context for HTTP client
 // information) and return the new one.
-func (s *reuseTokenSource) Token() (*Token, error) {
+func (s *reuseTokenSource) Token(headers http.Header) (*Token, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.t.Valid() {
 		return s.t, nil
 	}
-	t, err := s.new.Token()
+	t, err := s.new.Token(headers)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +321,7 @@ type staticTokenSource struct {
 	t *Token
 }
 
-func (s staticTokenSource) Token() (*Token, error) {
+func (s staticTokenSource) Token(headers http.Header) (*Token, error) {
 	return s.t, nil
 }
 

@@ -53,7 +53,7 @@ type Config struct {
 //
 // The provided context optionally controls which HTTP client is used. See the oauth2.HTTPClient variable.
 func (c *Config) Token(ctx context.Context) (*oauth2.Token, error) {
-	return c.TokenSource(ctx).Token()
+	return c.TokenSource(ctx).Token(nil)
 }
 
 // Client returns an HTTP client using the provided token.
@@ -87,7 +87,7 @@ type tokenSource struct {
 
 // Token refreshes the token by using a new client credentials request.
 // tokens received this way do not include a refresh token
-func (c *tokenSource) Token() (*oauth2.Token, error) {
+func (c *tokenSource) Token(headers http.Header) (*oauth2.Token, error) {
 	v := url.Values{
 		"grant_type": {"client_credentials"},
 	}
@@ -103,7 +103,7 @@ func (c *tokenSource) Token() (*oauth2.Token, error) {
 		v[k] = p
 	}
 
-	tk, err := internal.RetrieveToken(c.ctx, c.conf.ClientID, c.conf.ClientSecret, c.conf.TokenURL, v, internal.AuthStyle(c.conf.AuthStyle))
+	tk, err := internal.RetrieveToken(c.ctx, c.conf.ClientID, c.conf.ClientSecret, c.conf.TokenURL, v, headers, internal.AuthStyle(c.conf.AuthStyle))
 	if err != nil {
 		if rErr, ok := err.(*internal.RetrieveError); ok {
 			return nil, (*oauth2.RetrieveError)(rErr)
