@@ -42,7 +42,7 @@ func TestJWTAccessTokenSourceFromJSON(t *testing.T) {
 		t.Fatalf("JWTAccessTokenSourceFromJSON: %v\nJSON: %s", err, string(jsonKey))
 	}
 
-	tok, err := ts.Token()
+	tok, err := ts.Token(nil)
 	if err != nil {
 		t.Fatalf("Token: %v", err)
 	}

@@ -7,6 +7,7 @@ package google
 import (
 	"crypto/rsa"
 	"fmt"
+	"net/http"
 	"time"
 
 	"golang.org/x/oauth2"
@@ -38,7 +39,7 @@ func JWTAccessTokenSourceFromJSON(jsonKey []byte, audience string) (oauth2.Token
 		pk:       pk,
 		pkID:     cfg.PrivateKeyID,
 	}
-	tok, err := ts.Token()
+	tok, err := ts.Token(nil)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +52,7 @@ type jwtAccessTokenSource struct {
 	pkID            string
 }
 
-func (ts *jwtAccessTokenSource) Token() (*oauth2.Token, error) {
+func (ts *jwtAccessTokenSource) Token(headers http.Header) (*oauth2.Token, error) {
 	iat := time.Now()
 	exp := iat.Add(time.Hour)
 	cs := &jws.ClaimSet{

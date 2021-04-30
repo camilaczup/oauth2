@@ -98,7 +98,7 @@ type jwtSource struct {
 	conf *Config
 }
 
-func (js jwtSource) Token() (*oauth2.Token, error) {
+func (js jwtSource) Token(headers http.Header) (*oauth2.Token, error) {
 	pk, err := internal.ParseKey(js.conf.PrivateKey)
 	if err != nil {
 		return nil, err

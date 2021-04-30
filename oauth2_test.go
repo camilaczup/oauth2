@@ -513,7 +513,7 @@ func TestRefreshToken_RefreshTokenReplacement(t *testing.T) {
 	defer ts.Close()
 	conf := newConf(ts.URL)
 	tkr := conf.TokenSource(context.Background(), &Token{RefreshToken: "OLD_REFRESH_TOKEN"})
-	tk, err := tkr.Token()
+	tk, err := tkr.Token(nil)
 	if err != nil {
 		t.Errorf("got err = %v; want none", err)
 		return
@@ -533,7 +533,7 @@ func TestRefreshToken_RefreshTokenPreservation(t *testing.T) {
 	conf := newConf(ts.URL)
 	const oldRefreshToken = "OLD_REFRESH_TOKEN"
 	tkr := conf.TokenSource(context.Background(), &Token{RefreshToken: oldRefreshToken})
-	tk, err := tkr.Token()
+	tk, err := tkr.Token(nil)
 	if err != nil {
 		t.Fatalf("got err = %v; want none", err)
 	}

@@ -82,7 +82,7 @@ func TestImpersonation(t *testing.T) {
 	defer func() { now = oldNow }()
 	now = testNow
 
-	tok, err := ourTS.Token()
+	tok, err := ourTS.Token(nil)
 	if err != nil {
 		t.Fatalf("Unexpected error: %e", err)
 	}

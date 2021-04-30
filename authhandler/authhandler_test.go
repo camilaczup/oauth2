@@ -45,7 +45,7 @@ func TestTokenExchange_Success(t *testing.T) {
 		},
 	}
 
-	tok, err := TokenSource(context.Background(), conf, "testState", authhandler).Token()
+	tok, err := TokenSource(context.Background(), conf, "testState", authhandler).Token(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func TestTokenExchange_StateMismatch(t *testing.T) {
 		},
 	}
 
-	_, err := TokenSource(context.Background(), conf, "testState", authhandler).Token()
+	_, err := TokenSource(context.Background(), conf, "testState", authhandler).Token(nil)
 	if want_err := "state mismatch in 3-legged-OAuth flow"; err == nil || err.Error() != want_err {
 		t.Errorf("err = %q; want %q", err, want_err)
 	}

@@ -9,6 +9,7 @@ package authhandler
 import (
 	"context"
 	"errors"
+	"net/http"
 
 	"golang.org/x/oauth2"
 )
@@ -43,7 +44,7 @@ type authHandlerSource struct {
 	state       string
 }
 
-func (source authHandlerSource) Token() (*oauth2.Token, error) {
+func (source authHandlerSource) Token(headers http.Header) (*oauth2.Token, error) {
 	url := source.config.AuthCodeURL(source.state)
 	code, state, err := source.authHandler(url)
 	if err != nil {

@@ -64,7 +64,7 @@ func TestJWTFetch_JSONResponse(t *testing.T) {
 		PrivateKey: dummyPrivateKey,
 		TokenURL:   ts.URL,
 	}
-	tok, err := conf.TokenSource(context.Background()).Token()
+	tok, err := conf.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func TestJWTFetch_BadResponse(t *testing.T) {
 		PrivateKey: dummyPrivateKey,
 		TokenURL:   ts.URL,
 	}
-	tok, err := conf.TokenSource(context.Background()).Token()
+	tok, err := conf.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -131,7 +131,7 @@ func TestJWTFetch_BadResponseType(t *testing.T) {
 		PrivateKey: dummyPrivateKey,
 		TokenURL:   ts.URL,
 	}
-	tok, err := conf.TokenSource(context.Background()).Token()
+	tok, err := conf.TokenSource(context.Background()).Token(nil)
 	if err == nil {
 		t.Error("got a token; expected error")
 		if got, want := tok.AccessToken, ""; got != want {
@@ -163,7 +163,7 @@ func TestJWTFetch_Assertion(t *testing.T) {
 		TokenURL:     ts.URL,
 	}
 
-	_, err := conf.TokenSource(context.Background()).Token()
+	_, err := conf.TokenSource(context.Background()).Token(nil)
 	if err != nil {
 		t.Fatalf("Failed to fetch token: %v", err)
 	}
@@ -234,7 +234,7 @@ func TestJWTFetch_AssertionPayload(t *testing.T) {
 		},
 	} {
 		t.Run(conf.Email, func(t *testing.T) {
-			_, err := conf.TokenSource(context.Background()).Token()
+			_, err := conf.TokenSource(context.Background()).Token(nil)
 			if err != nil {
 				t.Fatalf("Failed to fetch token: %v", err)
 			}
@@ -302,7 +302,7 @@ func TestTokenRetrieveError(t *testing.T) {
 		TokenURL:   ts.URL,
 	}
 
-	_, err := conf.TokenSource(context.Background()).Token()
+	_, err := conf.TokenSource(context.Background()).Token(nil)
 	if err == nil {
 		t.Fatalf("got no error, expected one")
 	}

@@ -77,7 +77,7 @@ type jwtSource struct {
 	conf *Config
 }
 
-func (js jwtSource) Token() (*oauth2.Token, error) {
+func (js jwtSource) Token(headers http.Header) (*oauth2.Token, error) {
 	exp := time.Duration(59) * time.Second
 	claimSet := &ClaimSet{
 		Issuer:       fmt.Sprintf("urn:atlassian:connect:clientid:%s", js.conf.ClientID),

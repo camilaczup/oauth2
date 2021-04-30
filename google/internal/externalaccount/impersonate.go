@@ -9,11 +9,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/oauth2"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"golang.org/x/oauth2"
 )
 
 // generateAccesstokenReq is used for service account impersonation
@@ -37,7 +38,7 @@ type impersonateTokenSource struct {
 }
 
 // Token performs the exchange to get a temporary service account
-func (its impersonateTokenSource) Token() (*oauth2.Token, error) {
+func (its impersonateTokenSource) Token(headers http.Header) (*oauth2.Token, error) {
 	reqBody := generateAccessTokenReq{
 		Lifetime: "3600s",
 		Scope:    its.scopes,

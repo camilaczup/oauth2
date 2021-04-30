@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -201,7 +202,7 @@ type computeSource struct {
 	scopes  []string
 }
 
-func (cs computeSource) Token() (*oauth2.Token, error) {
+func (cs computeSource) Token(headers http.Header) (*oauth2.Token, error) {
 	if !metadata.OnGCE() {
 		return nil, errors.New("oauth2/google: can't get a token from the metadata service; not running on GCE")
 	}
