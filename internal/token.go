@@ -23,6 +23,8 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
+const TRACE_ID string = "X-B3-TraceId"
+
 // Token represents the credentials used to authorize
 // the requests to access protected resources on the OAuth 2.0
 // provider's backend.
@@ -156,7 +158,7 @@ func setAuthStyle(tokenURL string, v AuthStyle) {
 // as the POST body. An 'inParams' value of true means to send it in
 // the POST body (along with any values in v); false means to send it
 // in the Authorization header.
-func newTokenRequest(tokenURL, clientID, clientSecret string, v url.Values, authStyle AuthStyle) (*http.Request, error) {
+func newTokenRequest(tokenURL, clientID, clientSecret string, v url.Values, headers http.Header, authStyle AuthStyle) (*http.Request, error) {
 	if authStyle == AuthStyleInParams {
 		v = cloneURLValues(v)
 		if clientID != "" {
@@ -170,6 +172,7 @@ func newTokenRequest(tokenURL, clientID, clientSecret string, v url.Values, auth
 	if err != nil {
 		return nil, err
 	}
+	req.Header.Set(TRACE_ID, headers.Get(TRACE_ID))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if authStyle == AuthStyleInHeader {
 		req.SetBasicAuth(url.QueryEscape(clientID), url.QueryEscape(clientSecret))
@@ -185,7 +188,7 @@ func cloneURLValues(v url.Values) url.Values {
 	return v2
 }
 
-func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string, v url.Values, authStyle AuthStyle) (*Token, error) {
+func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string, v url.Values, headers http.Header, authStyle AuthStyle) (*Token, error) {
 	needsAuthStyleProbe := authStyle == 0
 	if needsAuthStyleProbe {
 		if style, ok := lookupAuthStyle(tokenURL); ok {
@@ -195,7 +198,7 @@ func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string,
 			authStyle = AuthStyleInHeader // the first way we'll try
 		}
 	}
-	req, err := newTokenRequest(tokenURL, clientID, clientSecret, v, authStyle)
+	req, err := newTokenRequest(tokenURL, clientID, clientSecret, v, headers, authStyle)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +217,7 @@ func RetrieveToken(ctx context.Context, clientID, clientSecret, tokenURL string,
 		// they went, but maintaining it didn't scale & got annoying.
 		// So just try both ways.
 		authStyle = AuthStyleInParams // the second way we'll try
-		req, _ = newTokenRequest(tokenURL, clientID, clientSecret, v, authStyle)
+		req, _ = newTokenRequest(tokenURL, clientID, clientSecret, v, headers, authStyle)
 		token, err = doTokenRoundTrip(ctx, req)
 	}
 	if needsAuthStyleProbe && err == nil {
