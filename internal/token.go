@@ -23,7 +23,12 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-const TRACE_ID string = "X-B3-TraceId"
+const (
+	TraceIDHeader = "X-B3-TraceId"
+	SpanIDHeader  = "X-B3-SpanId"
+	JaegerHeader  = "uber-trace-id"
+	AwsHeader     = "X-Amzn-Trace-Id"
+)
 
 // Token represents the credentials used to authorize
 // the requests to access protected resources on the OAuth 2.0
@@ -172,12 +177,19 @@ func newTokenRequest(tokenURL, clientID, clientSecret string, v url.Values, head
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set(TRACE_ID, headers.Get(TRACE_ID))
+	addTracing(req, headers)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if authStyle == AuthStyleInHeader {
 		req.SetBasicAuth(url.QueryEscape(clientID), url.QueryEscape(clientSecret))
 	}
 	return req, nil
+}
+
+func addTracing(req *http.Request, headers http.Header) {
+	req.Header.Set(TraceIDHeader, headers.Get(TraceIDHeader))
+	req.Header.Set(SpanIDHeader, headers.Get(SpanIDHeader))
+	req.Header.Set(JaegerHeader, headers.Get(JaegerHeader))
+	req.Header.Set(AwsHeader, headers.Get(AwsHeader))
 }
 
 func cloneURLValues(v url.Values) url.Values {
