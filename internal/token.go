@@ -186,10 +186,23 @@ func newTokenRequest(tokenURL, clientID, clientSecret string, v url.Values, head
 }
 
 func addTracing(req *http.Request, headers http.Header) {
-	req.Header.Set(TraceIDHeader, headers.Get(TraceIDHeader))
-	req.Header.Set(SpanIDHeader, headers.Get(SpanIDHeader))
-	req.Header.Set(JaegerHeader, headers.Get(JaegerHeader))
-	req.Header.Set(AwsHeader, headers.Get(AwsHeader))
+	zipkinTrace := headers.Get(TraceIDHeader)
+	zipkinSpan := headers.Get(SpanIDHeader)
+	jaegerTrace := headers.Get(JaegerHeader)
+	awsTrace := headers.Get(AwsHeader)
+
+	if zipkinTrace != "" {
+		req.Header.Set(TraceIDHeader, zipkinTrace)
+	}
+	if zipkinSpan != "" {
+		req.Header.Set(SpanIDHeader, zipkinSpan)
+	}
+	if jaegerTrace != "" {
+		req.Header.Set(JaegerHeader, jaegerTrace)
+	}
+	if awsTrace != "" {
+		req.Header.Set(AwsHeader, awsTrace)
+	}
 }
 
 func cloneURLValues(v url.Values) url.Values {
